@@ -181,15 +181,3 @@ fun LemonPreview() {
         LemonadeApp()
     }
 }
-
-@Composable
-fun LemonadeComponent(modifier: Modifier = Modifier) {
-
-}
-
-@Preview
-@Composable
-fun LemonadeComponentPreview() {
-
-}
-
