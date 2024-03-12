@@ -22,16 +22,20 @@ import androidx.activity.enableEdgeToEdge
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -77,6 +81,11 @@ fun TipTimeLayout() {
     var tipInput by remember {
         mutableStateOf("")
     }
+
+    var roundUp by remember {
+        mutableStateOf(false)
+    }
+
     val amount = amountInput.toDoubleOrNull() ?: 0.0
     val tipPercent = tipInput.toDoubleOrNull() ?: 0.0
     val tip = calculateTip(amount, tipPercent)
@@ -97,7 +106,11 @@ fun TipTimeLayout() {
         EditNumberField(
             label = R.string.bill_amount,
             value = amountInput,
-            onValueChange = {amountInput = it},
+            onValueChange = { amountInput = it },
+            keyboardOptions = KeyboardOptions.Default.copy(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Next
+            ),
             modifier = Modifier
                 .padding(bottom = 32.dp)
                 .fillMaxWidth()
@@ -106,10 +119,19 @@ fun TipTimeLayout() {
             label = R.string.how_was_the_service,
             value = tipInput,
             onValueChange = { tipInput = it },
+            keyboardOptions = KeyboardOptions.Default.copy(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done
+            ),
             modifier = Modifier
                 .padding(bottom = 32.dp)
                 .fillMaxWidth()
         )
+        RoundTheTipRow(
+            roundUp = roundUp,
+            onRoundUpChange = { roundUp = it },
+            modifier = Modifier.padding(bottom = 32.dp)
+            )
         Text(
             text = stringResource(R.string.tip_amount, tip),
             style = MaterialTheme.typography.displaySmall
@@ -121,6 +143,7 @@ fun TipTimeLayout() {
 @Composable
 fun EditNumberField(
     @StringRes label: Int,
+    keyboardOptions: KeyboardOptions,
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -130,14 +153,36 @@ fun EditNumberField(
             Text(stringResource(label))
         },
         singleLine = true,
-        keyboardOptions = KeyboardOptions.Default.copy(
-            keyboardType = KeyboardType.Number,
-            imeAction = ImeAction.Next
-        ),
+        keyboardOptions = keyboardOptions,
         value = value,
         onValueChange = onValueChange,
         modifier = modifier
     )
+}
+
+@Composable
+fun RoundTheTipRow(
+    roundUp: Boolean,
+    onRoundUpChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .size(48.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = stringResource(R.string.round_up_tip)
+        )
+        Switch(
+            checked = roundUp,
+            onCheckedChange = onRoundUpChange,
+            modifier = modifier
+                .fillMaxWidth()
+                .wrapContentWidth(Alignment.End)
+        )
+    }
 }
 
 /**
