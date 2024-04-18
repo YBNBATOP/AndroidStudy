@@ -76,6 +76,7 @@ dependencies {
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
     implementation("org.junit.jupiter:junit-jupiter:5.8.1")
+    implementation("androidx.room:room-compiler:2.6.1")
 
     testImplementation("junit:junit:4.13.2")
 
