@@ -21,6 +21,8 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -36,6 +38,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -51,7 +54,7 @@ import com.example.lunchtray.ui.OrderViewModel
 import com.example.lunchtray.ui.SideDishMenuScreen
 import com.example.lunchtray.ui.StartOrderScreen
 
-enum class LunchTrayScreen (@StringRes val title: Int) {
+enum class LunchTrayScreen(@StringRes val title: Int) {
     Start(title = R.string.app_name),
     Entree(title = R.string.choose_entree),
     SideDish(title = R.string.choose_side_dish),
@@ -121,41 +124,71 @@ fun LunchTrayApp() {
                     onStartOrderButtonClicked = { navController.navigate(LunchTrayScreen.Entree.name) },
                     modifier = Modifier
                         .fillMaxSize()
+                        .padding(innerPadding)
                 )
             }
 
             composable(LunchTrayScreen.Entree.name) {
                 EntreeMenuScreen(
                     options = DataSource.entreeMenuItems,
-                    onCancelButtonClicked = { navController.popBackStack() },
+                    onCancelButtonClicked = {
+                        viewModel.resetOrder()
+                        navController.popBackStack(LunchTrayScreen.Start.name, inclusive = false)
+                    },
                     onNextButtonClicked = { navController.navigate(LunchTrayScreen.SideDish.name) },
-                    onSelectionChanged = {}
+                    onSelectionChanged = { item ->
+                        viewModel.updateEntree(item)
+                    },
+                    modifier = Modifier
+                        .verticalScroll(rememberScrollState())
+                        .padding(innerPadding)
                 )
             }
 
             composable(LunchTrayScreen.SideDish.name) {
                 SideDishMenuScreen(
                     options = DataSource.sideDishMenuItems,
-                    onCancelButtonClicked = { /*TODO*/ },
+                    onCancelButtonClicked = {
+                        viewModel.resetOrder()
+                        navController.popBackStack(LunchTrayScreen.Start.name, inclusive = false)
+                    },
                     onNextButtonClicked = { navController.navigate(LunchTrayScreen.Accompaniment.name) },
-                    onSelectionChanged = {}
+                    onSelectionChanged = { item ->
+                        viewModel.updateSideDish(item)
+                    }
                 )
             }
 
             composable(LunchTrayScreen.Accompaniment.name) {
                 AccompanimentMenuScreen(
                     options = DataSource.accompanimentMenuItems,
-                    onCancelButtonClicked = { /*TODO*/ },
+                    onCancelButtonClicked = {
+                        navController.popBackStack(
+                            LunchTrayScreen.SideDish.name,
+                            inclusive = false
+                        )
+                    },
                     onNextButtonClicked = { navController.navigate(LunchTrayScreen.Checkout.name) },
-                    onSelectionChanged = {}
+                    onSelectionChanged = { item ->
+                        viewModel.updateAccompaniment(item)
+                    }
                 )
             }
 
             composable(LunchTrayScreen.Checkout.name) {
                 CheckoutScreen(
                     orderUiState = uiState,
-                    onNextButtonClicked = { /*TODO*/ },
-                    onCancelButtonClicked = { /*TODO*/ })
+                    onNextButtonClicked = { navController.popBackStack(LunchTrayScreen.Start.name, inclusive = false)},
+                    onCancelButtonClicked = { navController.popBackStack(LunchTrayScreen.Start.name, inclusive = false) },
+                    modifier = Modifier
+                        .verticalScroll(rememberScrollState())
+                        .padding(
+                            top = innerPadding.calculateTopPadding(),
+                            bottom = innerPadding.calculateBottomPadding(),
+                            start = dimensionResource(R.dimen.padding_medium),
+                            end = dimensionResource(R.dimen.padding_medium)
+                        )
+                )
             }
 
         }
