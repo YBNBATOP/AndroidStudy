@@ -28,15 +28,19 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.lunchtray.datasource.DataSource
+import com.example.lunchtray.ui.AccompanimentMenuScreen
+import com.example.lunchtray.ui.CheckoutScreen
 import com.example.lunchtray.ui.EntreeMenuScreen
 import com.example.lunchtray.ui.OrderViewModel
 import com.example.lunchtray.ui.SideDishMenuScreen
+import com.example.lunchtray.ui.StartOrderScreen
 
 enum class LunchTrayScreen {
+    Start,
     Entree,
     SideDish,
     Accompaniment,
-    Review
+    Checkout
 }
 
 // TODO: AppBar
@@ -61,9 +65,15 @@ fun LunchTrayApp(
 
         NavHost(
             navController = navController,
-            startDestination = LunchTrayScreen.Entree.name,
+            startDestination = LunchTrayScreen.Start.name,
             modifier = Modifier.padding(innerPadding)
         ) {
+            composable(LunchTrayScreen.Start.name) {
+                StartOrderScreen(
+                    onStartOrderButtonClicked = { navController.navigate(LunchTrayScreen.Entree.name) }
+                )
+            }
+
             composable(LunchTrayScreen.Entree.name) {
                 EntreeMenuScreen(
                     options = DataSource.entreeMenuItems,
@@ -77,10 +87,27 @@ fun LunchTrayApp(
                 SideDishMenuScreen(
                     options = DataSource.sideDishMenuItems,
                     onCancelButtonClicked = { /*TODO*/ },
-                    onNextButtonClicked = { /*TODO*/ },
+                    onNextButtonClicked = { navController.navigate(LunchTrayScreen.Accompaniment.name) },
                     onSelectionChanged = {}
                 )
             }
+
+            composable(LunchTrayScreen.Accompaniment.name) {
+                AccompanimentMenuScreen(
+                    options = DataSource.accompanimentMenuItems,
+                    onCancelButtonClicked = { /*TODO*/ },
+                    onNextButtonClicked = { navController.navigate(LunchTrayScreen.Checkout.name) },
+                    onSelectionChanged = {}
+                )
+            }
+
+            composable(LunchTrayScreen.Checkout.name) {
+                CheckoutScreen(
+                    orderUiState = uiState,
+                    onNextButtonClicked = { /*TODO*/ },
+                    onCancelButtonClicked = { /*TODO*/ })
+            }
+
         }
     }
 }
