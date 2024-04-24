@@ -39,8 +39,10 @@ class MarsViewModel : ViewModel() {
      * Gets Mars photos information from the Mars API Retrofit service and updates the
      * [MarsPhoto] [List] [MutableList].
      */
-    fun getMarsPhotos() {
-        val listResult = viewModelScope.launch { MarsApi.retrofitService.getPhotos() }
-        marsUiState = listResult.toString()
+    private fun getMarsPhotos() {
+        viewModelScope.launch {
+            val listResult = MarsApi.retrofitService.getPhotos()
+            marsUiState = listResult
+        }
     }
 }
