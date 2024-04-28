@@ -52,6 +52,15 @@ class ItemDetailsViewModel(
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
     }
+
+    fun reduceQuantityByOne() {
+        viewModelScope.launch {
+            val currentItem = uiState.value.itemDetails.toItem()
+            if (currentItem.quantity > 0) {
+                itemsRepository.updateItem(currentItem.copy(quantity = currentItem.quantity - 1))
+            }
+        }
+    }
 }
 
 /**
