@@ -58,6 +58,17 @@ class ItemDaoTest {
         assertEquals(allItems[0], item2)
     }
 
+    @Test
+    @Throws(Exception::class)
+    fun daoUpdateItems_updateItemsInDb() = runBlocking {
+        addTwoItemsToDb()
+        itemDao.update(Item(1, "Apples", 15.0, 25))
+        itemDao.update(Item(2, "Bananas", 5.0, 50))
+        val allItems = itemDao.getItems().first()
+        assertEquals(allItems[1], Item(1, "Apples", 15.0, 25))
+        assertEquals(allItems[0], Item(2, "Bananas", 5.0, 50))
+    }
+
 
     @After
     @Throws(IOException::class)
